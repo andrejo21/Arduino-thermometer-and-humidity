@@ -1,1 +1,254 @@
 
+//*************************************************************************************************************************************************************
+//  This is a small project I made because I needed a thermometer in my room
+//  It is pretty simple. I used an Arduino UNO, one AM2302 SIP Packaged Temperature and Humidity Sensor and one 2x16 LCD Display Top Left Blue - Qapass.
+//
+//  You will have to install DHT sensor library by Adafruit. Here is a link to it: https://github.com/adafruit/DHT-sensor-library
+//  You will have to install LiquidCristal library by Arduino, Adafruit. Here is a link to it: https://www.arduino.cc/reference/en/libraries/liquidcrystal/
+//
+//  I hope this project can help you. The code is easy to understand if you go trough it with a bit of patience.
+//  There are many lines of code because I wanted different displays in different situations.
+//  Example: If temperature<"chosen value" show "Too cold" on the display and so on.
+//  I also added a slow fade when the text from the example disappears. 
+//  Have fun changing it your way;)
+//*************************************************************************************************************************************************************
+#include <LiquidCrystal.h>
+
+#include <DHT.h>
+#include <DHT_U.h>
+
+#include <Adafruit_Sensor.h>
+ 
+#define DHTPIN 7
+#define DHTTYPE DHT22
+
+DHT dht(DHTPIN, DHTTYPE);
+
+int chk;
+float hum;
+float temp;
+
+LiquidCrystal lcd(12,11,5,4,3,2);
+
+const int currentPin = A0;
+int sensitivity = 66;
+int adcValue = 0;
+int offsetVoltage = 2500;
+double adcVoltage = 0;
+double currentValue = 0;
+
+
+void setup() {
+dht.begin();
+analogWrite(6,100);
+lcd.begin(16,2);
+lcd.print("Temp & Humidity");           //these messages are appearing just at the start
+lcd.setCursor(1,1);                     //you may change them as you like:)
+lcd.print("Sensor Arduino");
+delay(2000);
+lcd.clear();
+lcd.setCursor(2,0);
+lcd.print("by ANDREI");
+delay(2000);
+lcd.clear();
+}
+
+void loop() {
+hum=dht.readHumidity();
+temp=dht.readTemperature();
+
+                   lcd.print("Temp:   ");
+                    lcd.setCursor(10,0);
+                    lcd.print(temp);
+                    lcd.setCursor(14,0);
+                    lcd.print("*C");
+                    lcd.setCursor(0,1);
+                    lcd.print("Hum:    ");
+                    lcd.setCursor(10,1);
+                    lcd.print(hum);
+                    lcd.setCursor(14,1);
+                    lcd.print("%");
+                    delay(1000);
+                    lcd.clear();
+
+if(temp<=18){
+                  int x;
+                  if(hum>=70){
+                  for(x=16;x>=0;x--){
+                    lcd.setCursor(x,1);
+                    lcd.print("Umid. ridicata  ");
+                    lcd.setCursor(x,0);
+                    lcd.print("Temp. scazuta   ");
+                    delay(250);
+                  }
+                  delay(1000);
+                  for(x=16;x>=0;x--){
+                    lcd.setCursor(x,1);
+                    lcd.print("                 ");
+                    delay(250);
+                    lcd.setCursor(x,0);
+                    lcd.print("                 ");
+                    delay(250);
+                  }
+                  lcd.clear();
+                  }else if(hum<=69 && hum>=26){
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("Umid. optima    ");
+                      lcd.setCursor(x,0);
+                      lcd.print("Temp. scazuta   ");
+                      delay(250);
+                      }
+                      delay(1000);
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("                 ");
+                      delay(250);
+                      lcd.setCursor(x,0);
+                      lcd.print("                 ");
+                      delay(250);
+                    }
+                    lcd.clear();
+                  }else if(hum<=25){
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("Umid. scazuta   ");
+                      lcd.setCursor(x,0);
+                      lcd.print("Temp. scazuta   ");
+                      delay(250);
+                      }
+                      delay(1000);
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("                 ");
+                      delay(250);
+                      lcd.setCursor(x,0);
+                      lcd.print("                 ");
+                      delay(250);
+                    }
+                    lcd.clear();
+
+                  }
+}
+
+if(temp>=27){
+                  int x;
+                  if(hum>=70){
+                  for(x=16;x>=0;x--){
+                    lcd.setCursor(x,1);
+                    lcd.print("Umid. ridicata  ");
+                    lcd.setCursor(x,0);
+                    lcd.print("Temp. ridicata  ");
+                    delay(250);
+                  }
+                  delay(1000);
+                  for(x=16;x>=0;x--){
+                    lcd.setCursor(x,1);
+                    lcd.print("                 ");
+                    delay(250);
+                    lcd.setCursor(x,0);
+                    lcd.print("                 ");
+                    delay(250);
+                  }
+                  lcd.clear();
+                  }else if(hum<=69 && hum>=26){
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("Umid. optima    ");
+                      lcd.setCursor(x,0);
+                      lcd.print("Temp. ridicata  ");
+                      delay(250);
+                      }
+                      delay(1000);
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("                 ");
+                      delay(250);
+                      lcd.setCursor(x,0);
+                      lcd.print("                 ");
+                      delay(250);
+                    }
+                    lcd.clear();
+                  }else if(hum<=25){
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("Umid. scazuta   ");
+                      lcd.setCursor(x,0);
+                      lcd.print("Temp. ridicata  ");
+                      delay(250);
+                      }
+                      delay(1000);
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("                 ");
+                      delay(250);
+                      lcd.setCursor(x,0);
+                      lcd.print("                 ");
+                      delay(250);
+                    }
+                    lcd.clear();
+
+                  }
+}
+if(temp<27 && temp>18){
+                  int x;
+                  if(hum>=70){
+                  for(x=16;x>=0;x--){
+                    lcd.setCursor(x,1);
+                    lcd.print("Umid. ridicata  ");
+                    lcd.setCursor(x,0);
+                    lcd.print("Temp. optima    ");
+                    delay(250);
+                  }
+                  delay(1000);
+                  for(x=16;x>=0;x--){
+                    lcd.setCursor(x,1);
+                    lcd.print("                 ");
+                    delay(250);
+                    lcd.setCursor(x,0);
+                    lcd.print("                 ");
+                    delay(250);
+                  }
+                  lcd.clear();
+                  }else if(hum<=69 && hum>=26){
+                   lcd.print("Temp:   ");
+                    lcd.setCursor(10,0);
+                    lcd.print(temp);
+                    lcd.setCursor(14,0);
+                    lcd.print("*C");
+                    lcd.setCursor(0,1);
+                    lcd.print("Hum:    ");
+                    lcd.setCursor(10,1);
+                    lcd.print(hum);
+                    lcd.setCursor(14,1);
+                    lcd.print("%");
+                    delay(1000);
+                    lcd.clear();
+                  }else if(hum<=25){
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("Umid. scazuta   ");
+                      lcd.setCursor(x,0);
+                      lcd.print("Temp. optima    ");
+                      delay(250);
+                      }
+                      delay(1000);
+                    for(x=16;x>=0;x--){
+                      lcd.setCursor(x,1);
+                      lcd.print("                 ");
+                      delay(250);
+                      lcd.setCursor(x,0);
+                      lcd.print("                 ");
+                      delay(250);
+                    }
+                    lcd.clear();
+
+                  }
+}
+
+}
+
+
+
+
+
